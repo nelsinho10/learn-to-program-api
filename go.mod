@@ -3,11 +3,14 @@ module github.com/nelsinho10/learn-to-program-api
 go 1.18
 
 require (
-	github.com/dgraph-io/dgo/v200 v200.0.0-20210401091508-95bfd74de60e // indirect
-	github.com/go-chi/chi/v5 v5.0.7 // indirect
+	github.com/dgraph-io/dgo/v200 v200.0.0-20210401091508-95bfd74de60e
+	github.com/go-chi/chi/v5 v5.0.7
+	github.com/joho/godotenv v1.4.0
+)
+
+require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect

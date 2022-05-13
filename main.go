@@ -3,16 +3,12 @@ package main
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/nelsinho10/learn-to-program-api/routes"
 )
 
 func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
-	})
+	// Inicializando las rutas y el servidor
+	r := routes.Router()
 	http.ListenAndServe(":3000", r)
 
 }
