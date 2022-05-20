@@ -5,7 +5,7 @@ import (
 	"github.com/nelsinho10/learn-to-program-api/controllers"
 )
 
-// UserRouter agrupador de las rutas correspondientes a usuarios
+// UserRouter returns a chi router for users
 func UsersRouter(r chi.Router) {
 	r.Get("/", controllers.GetAllUsers)
 	r.Post("/add", controllers.NewUser)

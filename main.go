@@ -7,8 +7,7 @@ import (
 )
 
 func main() {
-	// Inicializando las rutas y el servidor
+	// Create a new router
 	r := routes.Router()
 	http.ListenAndServe(":3000", r)
-
 }

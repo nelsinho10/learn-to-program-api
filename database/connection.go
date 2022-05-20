@@ -11,29 +11,26 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// dgraphClient realizar la conexion a la base de datos
+// dgraphClient returns a dgraph client instance
 func dgraphClient() *dgo.Dgraph {
-	// Inicializar godotenv para obtener variables de entorno
+	// Load .env file
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	// Obtener variables de entorno
 	endpoint := os.Getenv("DB_ENDPOINT")
 	key := os.Getenv("DB_KEY")
 
-	// Conectandose a la base de datos
 	conn, err := dgo.DialSlashEndpoint(endpoint, key)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Retornando el cliente de Dgraph
 	return dgo.NewDgraphClient(api.NewDgraphClient(conn))
 }
 
-// MakeMutation realizar las mutaciones a la base de datos
+// MakeMutation makes a mutation
 func MakeMutation(data any) {
 	ctx := context.Background()
 
@@ -57,7 +54,7 @@ func MakeMutation(data any) {
 	print("res: %v", res)
 }
 
-// MakeQuery realizar consultas a la base de datos
+// MakeQuery makes a query and returns the result
 func MakeQuery(query string) *api.Response {
 	ctx := context.Background()
 
