@@ -5,11 +5,11 @@ go 1.18
 require (
 	github.com/dgraph-io/dgo/v200 v200.0.0-20210401091508-95bfd74de60e
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/cors v1.2.1
 	github.com/joho/godotenv v1.4.0
 )
 
 require (
-	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

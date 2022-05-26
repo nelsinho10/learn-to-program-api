@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
@@ -9,6 +10,9 @@ import (
 func Router() *chi.Mux {
 	// Create a new router
 	r := chi.NewRouter()
+
+	// Logger middleware
+	r.Use(middleware.Logger)
 
 	// CORS setup for all routes
 	r.Use(cors.Handler(cors.Options{
@@ -22,9 +26,7 @@ func Router() *chi.Mux {
 
 	// Routes for api
 	r.Route("/api", func(r chi.Router) {
-		r.Route("/users", UsersRouter)
 		r.Route("/programs", ProgramsRouter)
 	})
-
 	return r
 }

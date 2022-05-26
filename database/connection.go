@@ -46,12 +46,11 @@ func MakeMutation(data any) {
 		SetJson: lb,
 	}
 
-	res, err := txn.Mutate(ctx, mu)
+	_, err = txn.Mutate(ctx, mu)
 	if err != nil {
 		log.Fatal("failed to mutate ", err)
 	}
 
-	print("res: %v", res)
 }
 
 // MakeQuery makes a query and returns the result

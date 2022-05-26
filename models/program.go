@@ -2,6 +2,8 @@ package models
 
 import (
 	"io"
+	"log"
+	"time"
 
 	"github.com/nelsinho10/learn-to-program-api/database"
 )
@@ -16,35 +18,63 @@ type ProgramData struct {
 }
 
 // AddProgram add new program to dgraph
-func AddProgram(r io.ReadCloser) {
+func AddProgram(r io.ReadCloser, name string) {
 
 	// Program data
 	b, error := io.ReadAll(r)
 
 	if error != nil {
-		return
+		log.Fatal("Error reading program data", error)
 	}
 
 	program := string(b)
+	currentTime := time.Now().Format("2006-01-02")
 
 	pd := ProgramData{
-		Name:        "program1",
+		Name:        name,
 		Program:     program,
-		DateCreated: "2020-01-01",
-		DateUpdated: "2020-01-01",
+		DateCreated: currentTime,
+		DateUpdated: currentTime,
 		DType:       []string{"Program"},
 	}
 
 	database.MakeMutation(pd)
 }
 
+// UpdateProgram update program by id from dgraph
+func UpdateProgram(id string, r io.ReadCloser) {
+	// Program data
+	b, error := io.ReadAll(r)
+
+	if error != nil {
+		log.Fatal("Error reading program data", error)
+	}
+
+	program := string(b)
+	currentTime := time.Now().Format("2006-01-02")
+
+	pd := ProgramData{
+		Uid:         id,
+		Program:     program,
+		DateUpdated: currentTime,
+		DType:       []string{"Program"},
+	}
+
+	database.MakeMutation(pd)
+}
+
+// DeleteProgram delete program by id from dgraph
+func DeleteProgram(id string) {
+	// database.MakeDelete(id)
+}
+
 // AllPrograms returns all programs from dgraph
-func AllPrograms() []byte {
+func AllPrograms(initial string, final string) []byte {
 
 	// Query
 	q := `
 	{
-		programs(func: type(Program)) {
+		programs(func: type(Program),offset: ` + initial + `, first: ` + final + `) {
 			uid
 			name
 			date_created
@@ -70,6 +100,21 @@ func GetProgram(id string) []byte {
 			date_updated
 			program
 		  }
+	}
+	`
+	//
+	res := database.MakeQuery(q)
+	return res.Json
+}
+
+// CountPrograms return number of programs from dgraph
+func CountPrograms() []byte {
+	// Query
+	q := `
+	{
+		programs_counts(func: type(Program)){
+			count(uid)
+  		}
 	}
 	`
 	//

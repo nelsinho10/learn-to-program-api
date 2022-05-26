@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"fmt"
@@ -13,13 +13,21 @@ import (
 // NewProgram add new program
 func NewProgram(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	models.AddProgram(r.Body)
+	// Get name from url
+	name := chi.URLParam(r, "name")
+
+	models.AddProgram(r.Body, name)
+	w.Write([]byte("Program added"))
 }
 
 // GetPrograms returns all programs
 func GetPrograms(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	b := models.AllPrograms()
+	// Get range page
+	initial := chi.URLParam(r, "initial")
+	final := chi.URLParam(r, "final")
+
+	b := models.AllPrograms(initial, final)
 	w.Write(b)
 }
 
@@ -40,6 +48,7 @@ func ExecuteProgram(w http.ResponseWriter, r *http.Request) {
 	b, error := io.ReadAll(r.Body)
 
 	if error != nil {
+		helpers.Error(w, error)
 		return
 	}
 
@@ -49,4 +58,28 @@ func ExecuteProgram(w http.ResponseWriter, r *http.Request) {
 	// Run program
 	out := helpers.RunPythonFile(namePyhonFile)
 	w.Write(out)
+	helpers.DeleteFile(namePyhonFile)
+}
+
+// UpdateProgram update program by id
+func UpdateProgram(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+	models.UpdateProgram(id, r.Body)
+	w.Write([]byte("Program updated"))
+}
+
+// GetNumberOfPrograms return number of programs
+func GetNumberOfPrograms(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	b := models.CountPrograms()
+	w.Write(b)
+}
+
+// DeleteProgram delete program by id
+func DeleteProgram(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+	models.DeleteProgram(id)
+	w.Write([]byte("Program deleted"))
 }
