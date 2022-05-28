@@ -18,7 +18,7 @@ type ProgramData struct {
 }
 
 // AddProgram add new program to dgraph
-func AddProgram(r io.ReadCloser, name string) {
+func AddProgram(r io.ReadCloser, name string) string {
 
 	// Program data
 	b, error := io.ReadAll(r)
@@ -38,11 +38,12 @@ func AddProgram(r io.ReadCloser, name string) {
 		DType:       []string{"Program"},
 	}
 
-	database.MakeMutation(pd)
+	uid := database.MakeMutation(pd)
+	return uid
 }
 
 // UpdateProgram update program by id from dgraph
-func UpdateProgram(id string, r io.ReadCloser) {
+func UpdateProgram(id string, r io.ReadCloser) string {
 	// Program data
 	b, error := io.ReadAll(r)
 
@@ -60,7 +61,8 @@ func UpdateProgram(id string, r io.ReadCloser) {
 		DType:       []string{"Program"},
 	}
 
-	database.MakeMutation(pd)
+	uid := database.MakeMutation(pd)
+	return uid
 }
 
 // DeleteProgram delete program by id from dgraph
@@ -69,12 +71,12 @@ func DeleteProgram(id string) {
 }
 
 // AllPrograms returns all programs from dgraph
-func AllPrograms(initial string, final string) []byte {
+func AllPrograms(offset string, first string) []byte {
 
 	// Query
 	q := `
 	{
-		programs(func: type(Program),offset: ` + initial + `, first: ` + final + `) {
+		programs(func: type(Program),offset: ` + offset + `, first: ` + first + `) {
 			uid
 			name
 			date_created

@@ -16,18 +16,20 @@ func NewProgram(w http.ResponseWriter, r *http.Request) {
 	// Get name from url
 	name := chi.URLParam(r, "name")
 
-	models.AddProgram(r.Body, name)
-	w.Write([]byte("Program added"))
+	uid := models.AddProgram(r.Body, name)
+
+	// Response with json
+	w.Write([]byte(uid))
 }
 
 // GetPrograms returns all programs
 func GetPrograms(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// Get range page
-	initial := chi.URLParam(r, "initial")
-	final := chi.URLParam(r, "final")
+	offset := chi.URLParam(r, "offset")
+	first := chi.URLParam(r, "first")
 
-	b := models.AllPrograms(initial, final)
+	b := models.AllPrograms(offset, first)
 	w.Write(b)
 }
 

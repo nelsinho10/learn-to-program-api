@@ -31,7 +31,8 @@ func dgraphClient() *dgo.Dgraph {
 }
 
 // MakeMutation makes a mutation
-func MakeMutation(data any) {
+func MakeMutation(data any) string {
+	var uid string
 	ctx := context.Background()
 
 	txn := dgraphClient().NewTxn()
@@ -46,10 +47,16 @@ func MakeMutation(data any) {
 		SetJson: lb,
 	}
 
-	_, err = txn.Mutate(ctx, mu)
+	res, err := txn.Mutate(ctx, mu)
 	if err != nil {
 		log.Fatal("failed to mutate ", err)
 	}
+
+	for _, v := range res.Uids {
+		uid = v
+	}
+
+	return uid
 
 }
 
