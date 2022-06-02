@@ -7,11 +7,11 @@ import (
 
 // ProgramRouter returns a chi router for programs
 func ProgramsRouter(r chi.Router) {
-	r.Get("/{initial}/{final}", handlers.GetPrograms)
+	r.Get("/{offset}/{first}", handlers.GetPrograms)
 	r.Get("/{id}", handlers.GetProgram)
-	r.Post("/{name}", handlers.NewProgram)
-	r.Post("/{name}/execute-program", handlers.ExecuteProgram)
-	r.Put("/{id}", handlers.UpdateProgram)
 	r.Get("/count", handlers.GetNumberOfPrograms)
+	r.Post("/{name}", handlers.NewProgram)
+	r.Post("/{id}/execute-program", handlers.ExecuteProgram)
+	r.Patch("/{id}", handlers.UpdateProgram)
 	r.Delete("/{id}", handlers.DeleteProgram)
 }

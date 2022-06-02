@@ -18,17 +18,19 @@ type ProgramData struct {
 }
 
 // AddProgram add new program to dgraph
-func AddProgram(r io.ReadCloser, name string) {
+func AddProgram(r io.ReadCloser, name string) (string, error) {
 
 	// Program data
 	b, error := io.ReadAll(r)
 
 	if error != nil {
-		log.Fatal("Error reading program data", error)
+		log.Println(error)
+		return "", error
+
 	}
 
 	program := string(b)
-	currentTime := time.Now().Format("2006-01-02")
+	currentTime := time.Now().Format("2006-01-02  15:04:05")
 
 	pd := ProgramData{
 		Name:        name,
@@ -38,20 +40,28 @@ func AddProgram(r io.ReadCloser, name string) {
 		DType:       []string{"Program"},
 	}
 
-	database.MakeMutation(pd)
+	uid, error := database.MakeMutationAdd(pd)
+
+	if error != nil {
+		log.Println(error)
+		return "", error
+	}
+
+	return uid, nil
 }
 
 // UpdateProgram update program by id from dgraph
-func UpdateProgram(id string, r io.ReadCloser) {
+func UpdateProgram(id string, r io.ReadCloser) (string, error) {
 	// Program data
 	b, error := io.ReadAll(r)
 
 	if error != nil {
-		log.Fatal("Error reading program data", error)
+		log.Println(error)
+		return "", error
 	}
 
 	program := string(b)
-	currentTime := time.Now().Format("2006-01-02")
+	currentTime := time.Now().Format("2006-01-02 15:04:05")
 
 	pd := ProgramData{
 		Uid:         id,
@@ -60,21 +70,23 @@ func UpdateProgram(id string, r io.ReadCloser) {
 		DType:       []string{"Program"},
 	}
 
-	database.MakeMutation(pd)
-}
+	uid, error := database.MakeMutationAdd(pd)
 
-// DeleteProgram delete program by id from dgraph
-func DeleteProgram(id string) {
-	// database.MakeDelete(id)
+	if error != nil {
+		log.Println(error)
+		return "", error
+	}
+
+	return uid, nil
 }
 
 // AllPrograms returns all programs from dgraph
-func AllPrograms(initial string, final string) []byte {
+func AllPrograms(offset string, first string) ([]byte, error) {
 
 	// Query
 	q := `
 	{
-		programs(func: type(Program),offset: ` + initial + `, first: ` + final + `) {
+		programs(func: type(Program),offset: ` + offset + `, first: ` + first + `) {
 			uid
 			name
 			date_created
@@ -84,12 +96,18 @@ func AllPrograms(initial string, final string) []byte {
 	}
 	`
 	//
-	res := database.MakeQuery(q)
-	return res.Json
+	res, error := database.MakeQuery(q)
+
+	if error != nil {
+		log.Println(error)
+		return nil, error
+	}
+
+	return res.Json, nil
 }
 
 // GetProgram return program by id from dgraph
-func GetProgram(id string) []byte {
+func GetProgram(id string) ([]byte, error) {
 	// Query
 	q := `
 	{
@@ -103,12 +121,18 @@ func GetProgram(id string) []byte {
 	}
 	`
 	//
-	res := database.MakeQuery(q)
-	return res.Json
+	res, error := database.MakeQuery(q)
+
+	if error != nil {
+		log.Println(error)
+		return nil, error
+	}
+
+	return res.Json, nil
 }
 
 // CountPrograms return number of programs from dgraph
-func CountPrograms() []byte {
+func CountPrograms() ([]byte, error) {
 	// Query
 	q := `
 	{
@@ -118,6 +142,25 @@ func CountPrograms() []byte {
 	}
 	`
 	//
-	res := database.MakeQuery(q)
-	return res.Json
+	res, error := database.MakeQuery(q)
+
+	if error != nil {
+		log.Println(error)
+		return nil, error
+	}
+
+	return res.Json, nil
+}
+
+// DeleteProgram delete program by id from dgraph
+func DeleteProgram(id string) error {
+
+	error := database.MakeMutationDelete(id)
+
+	if error != nil {
+		log.Println(error)
+		return error
+	}
+
+	return nil
 }

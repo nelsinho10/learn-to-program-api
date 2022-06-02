@@ -16,18 +16,31 @@ func NewProgram(w http.ResponseWriter, r *http.Request) {
 	// Get name from url
 	name := chi.URLParam(r, "name")
 
-	models.AddProgram(r.Body, name)
-	w.Write([]byte("Program added"))
+	uid, error := models.AddProgram(r.Body, name)
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Response with json
+	w.Write([]byte(uid))
 }
 
 // GetPrograms returns all programs
 func GetPrograms(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// Get range page
-	initial := chi.URLParam(r, "initial")
-	final := chi.URLParam(r, "final")
+	offset := chi.URLParam(r, "offset")
+	first := chi.URLParam(r, "first")
 
-	b := models.AllPrograms(initial, final)
+	b, error := models.AllPrograms(offset, first)
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Write(b)
 }
 
@@ -35,28 +48,45 @@ func GetPrograms(w http.ResponseWriter, r *http.Request) {
 func GetProgram(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
-	b := models.GetProgram(id)
+	b, error := models.GetProgram(id)
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Write(b)
 }
 
 // ExecuteProgram execute program by name
 func ExecuteProgram(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	name := chi.URLParam(r, "name")
+	name := chi.URLParam(r, "id")
 	namePyhonFile := fmt.Sprintf("%s.py", name)
 
 	b, error := io.ReadAll(r.Body)
 
 	if error != nil {
-		helpers.Error(w, error)
+		http.Error(w, error.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Create a new file
-	helpers.CreateFile(namePyhonFile, string(b))
+	error = helpers.CreateFile(namePyhonFile, string(b))
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// Run program
-	out := helpers.RunPythonFile(namePyhonFile)
+	out, error := helpers.RunPythonFile(namePyhonFile)
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Write(out)
 	helpers.DeleteFile(namePyhonFile)
 }
@@ -65,14 +95,26 @@ func ExecuteProgram(w http.ResponseWriter, r *http.Request) {
 func UpdateProgram(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
-	models.UpdateProgram(id, r.Body)
+	_, error := models.UpdateProgram(id, r.Body)
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Write([]byte("Program updated"))
 }
 
 // GetNumberOfPrograms return number of programs
-func GetNumberOfPrograms(w http.ResponseWriter, r *http.Request) {
+func GetNumberOfPrograms(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	b := models.CountPrograms()
+	b, error := models.CountPrograms()
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Write(b)
 }
 
@@ -80,6 +122,12 @@ func GetNumberOfPrograms(w http.ResponseWriter, r *http.Request) {
 func DeleteProgram(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
-	models.DeleteProgram(id)
+	error := models.DeleteProgram(id)
+
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Write([]byte("Program deleted"))
 }
