@@ -2,21 +2,16 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
-	"github.com/joho/godotenv"
+	"github.com/nelsinho10/learn-to-program-api/helpers"
 	"github.com/nelsinho10/learn-to-program-api/routes"
 )
 
 func main() {
-	// Load .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	addr := fmt.Sprintf(":%s", os.Getenv("PORT"))
+
+	// Port to listen on
+	addr := fmt.Sprintf(":%s", helpers.GetEnv("PORT", "3000"))
 
 	// Create a new router
 	r := routes.Router()
